@@ -1,0 +1,5 @@
+https://www.investing.com/commodities/dutch-ttf-gas-c1-futures-historical-data
+https://www.eia.gov/dnav/ng/TblDefs/ng_sum_sndm_tbldef2.asp#:~:text=The%20use%20of%20natural%20gas,input%20to%20a%20manufacturing%20process.&text=The%20process%20of%20producing%20consumer,site%20and%20by%20processing%20losses.
+https://www.eia.gov/dnav/ng/ng_prod_sum_dc_NUS_MMCF_m.htm
+
+blob:https://www.investing.com/2f0fe62c-7b28-49dd-9d90-f6243380177c
