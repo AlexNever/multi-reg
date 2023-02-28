@@ -1,6 +1,4 @@
 ## Project 1 - Assessing the relationship between US-EU Natural Gas Arbitrage (TTF-Henry Hub) and Energy Select Sector SPDR Fund (XLE) Prices
-setwd("G:/My Drive/2. Stern/1. Academics/2. Semester/3. Regression and Multivariate Data Analysis/Project 1/")
-
 library(ggplot2)
 library(stringr)
 library(moments)
