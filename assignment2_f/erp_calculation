@@ -1,0 +1,28 @@
+Country Risk Premiums
+To estimate the equity risk premium for a country, I start with a mature market premium and add an additional country risk premium, based upon the risk of the country in question.
+Use the look up table in the next worksheet, to look up the statistics for an individual country or region.
+
+Step 1: Estimating mature market risk premium
+To estimate the mature market risk premium, I compute the implied equity risk premium for the S&P 500. To see the latest estimate for this number, go to my website and you can download the excel spreadsheet containing the implied premium
+Link to site:
+Historical monthly ERP:
+
+Step 2: Estimate the default spread for the country in question. I offer two choices, one based upon the local currency sovereign rating for the country from Moody's and the other is the CDS spread for the country (if one exists)
+Moody's ratings:
+Ratings to spreads:
+CDS spreads:
+If you cannot find a country on this list, it is because that country does not have a sovereign rating or a sovereign CDS spread. Try the PRS worksheet in this spreadsheet for an alternate estimate.
+
+Step 3: Convert the default spread into a country risk premium
+With sovereign ratings default spreads, you have two choices:
+Choice 1: Use the default spread as the measure of the additional country risk premium. To make this choice, go into the ERP worksheet and set cell E5 to 1.00.
+Choice 2: Scale the default spread up to reflect the higher risk of equity in the market, relative to the default spread. I used the ratio of the S&P Emerging Market Equity Index std deviation to the BAML Emerging Public Bond index standard deviation
+You can see the relative ratios for individual countries in the worksheet "Equity vs Govt Bond" in this spreadsheet. Set cell E5 in the ERP worksheet to that number.
+With CDS spreads, I compute the base number in two steps
+Substep 1: Since the base equity premium is computed for the US, and the US has a CDS spread, I subtracted out the US CDS spread from the CDS for other markets.
+For simplicity (and since it does not make a big difference), I assume that any country that has a CDS spread lower than the US will have a zero country risk premium and end up with a total equity risk premium equal to the US.
+Substep 2: I apply the scaling factor that you chose for the default spreads to this number to get a country risk premium. The default scaling is set at the my most recent year's estimate, but you can change it to 1, if you would
+prefer not to scale the default spread.
+
+Step 4: Compute a total equity risk premium
+Add the mature market premium from step 1 to the country risk premium from step 3 to get a total equity risk premium.
