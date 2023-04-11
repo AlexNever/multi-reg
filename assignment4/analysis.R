@@ -222,51 +222,17 @@ model_selection = data.frame(ms$Modnames, ms$`d_coal d_asx d_bdi`, ms$AIC, ms$ai
 
 
 ########################################################################Model 2
-df_red = df[-c((influential-1):nrow(df)),]
 
-##### Data Exploration #####
-
-sumtable(df_red[,c(6:11)])
-
-#### Histograms
-brs <- seq(min(df_red$d_yal), max(df_red$d_yal), length.out = 100)
-
-hist(df_red$d_yal, breaks = 25)
-
-####### Beautifully distributed!
-
-#### Scatterplots
-
-### Yal vs. Coal
-p_yal_coal <- ggplot(df_red, aes_string(y = df_red$d_yal, x = df_red$d_coal)) +
-  geom_point() + xlab("Change in Coal Price") + ylab("Change in Yancoal Stock Price") 
-
-### Yal vs. ASX
-p_yal_asx <- ggplot(df_red, aes_string(y = df_red$d_yal, x = df_red$d_asx)) +
-  geom_point()+ xlab("Change in ASX") + ylab("") 
-
-### Yal vs. BDI
-p_yal_bdi <- ggplot(df_red, aes_string(y = df_red$d_yal, x = df_red$d_bdi)) +
-  geom_point() + xlab("Change in BDI") + ylab("Change in Yancoal Stock Price (weekly)") 
-
-### Yal vs. Time
-p_yal_time <- ggplot(df_red, aes_string(y = df_red$d_yal, x = df_red$time)) +
-  geom_point() + xlab("Time") + ylab("") 
-
-grid.arrange(p_yal_coal, p_yal_asx, p_yal_bdi, p_yal_time, nrow = 2, ncol = 2)
-
-#### End Scatterplots
-
-#Start models
-lm_2 <- lm(d_yal ~ d_coal + d_asx + d_bdi, data=df_red)
+#Start model simple
+lm_2 <- lm(d_yal ~ d_coal, data=df)
 summary(lm_2)
 
-df_red["res_lm2"] = c(rstandard(lm_2))
-df_red["fit_lm2"] = c(fitted(lm_2))
+df["res_lm2"] = c(rstandard(lm_2))
+df["fit_lm2"] = c(fitted(lm_2))
 dd_lm2 = c(density(resid(lm_2)))
 
 #### Regression Diagnostics
-p_fit_res1 <-  ggplot(data = df_red, aes(x = fit_lm2, y = res_lm2)) +
+p_fit_res1 <-  ggplot(data = df, aes(x = fit_lm2, y = res_lm2)) +
   geom_point() +
   geom_abline(intercept = 0, slope = 0, color = "blue") +
   labs(x = "Fitted", y = "Residuals") 
@@ -276,12 +242,12 @@ p_density1 <- ggplot(data = data.frame(x = dd_lm2$x, y = dd_lm2$y), aes(x = x, y
   xlab("Residuals") +
   ylab("Density")
 
-p_res_order1 <-  ggplot(data = df_red, aes(x = time, y = res_lm2)) +
+p_res_order1 <-  ggplot(data = df, aes(x = time, y = res_lm2)) +
   geom_point() +
   geom_abline(intercept = 0, slope = 0, color = "blue") +
   labs(x = "Order", y = "Residuals") 
 
-qq_plot1 <- ggplot(data = data.frame(residuals = df_red$res_lm2), aes(sample = df_red$res_lm2)) +
+qq_plot1 <- ggplot(data = data.frame(residuals = df$res_lm2), aes(sample = df$res_lm2)) +
   stat_qq() +
   xlab("Theoretical Quantiles") +
   ylab("Ordered Values") +
@@ -292,70 +258,12 @@ grid.arrange(p_fit_res1, p_density1, p_res_order1, qq_plot1, nrow = 2, ncol = 2)
 #### End: Regression Diagnostics
 
 #### Start: Cook's Distance
-df_red["cooksd_lm2"] <- cooks.distance(lm_2)
+df["cooksd_lm2"] <- cooks.distance(lm_2)
 cooksd = cooks.distance(lm_2)
-plot(df_red$cooksd_lm2, pch="*", cex=2, main="Influential Obs by Cooks distance")  # plot cook's distance
-
-#Store big leverage point for later.
-
-top_x_outlier <- 1
-influential <- as.numeric(names(sort(cooksd, decreasing = TRUE)[1:top_x_outlier]))
-df_red_inf = df_red[influential,]
-
-# Collinearity
-paste(c(vif(lm_2), 1/(1-summary(lm_2)$r.squared)) )
-
-# Durbin-Watson Test
-acf(df_red$res_lm2)
-durbinWatsonTest(lm_2)
+plot(df$cooksd_lm2, pch="*", cex=2, main="Influential Obs by Cooks distance")  # plot cook's distance
 
 # ACF Plot
-acf(df_red$res_lm2)
+acf(df$res_lm2)
 
 #Runs Test
-RunsTest(df_red$res_lm2)
-
-# Model Selection Cp, R^2, adjR^2
-cp = leaps(cbind(df_red$d_coal,df_red$d_asx,df_red$d_bdi),df_red$d_yal,nbest=3, method = "Cp")
-adjr2 = leaps(cbind(df_red$d_coal,df_red$d_asx,df_red$d_bdi),df_red$d_yal,nbest=3,method="adjr2")
-r2 = leaps(cbind(df_red$d_coal,df_red$d_asx,df_red$d_bdi),df_red$d_yal,nbest=3,method="r2")
-
-# Order test
-r2[["which"]] == cp[["which"]]
-r2[["which"]] == adjr2[["which"]]
-
-aic_models = list()
-# AIC, AICc
-aic_models[[1]] <- lm(d_yal ~ d_coal, data = df_red)
-aic_models[[2]] <- lm(d_yal ~ d_asx, data = df_red)
-aic_models[[3]] <- lm(d_yal ~ d_bdi, data = df_red)
-aic_models[[4]] <- lm(d_yal ~ d_coal + d_asx, data = df_red)
-aic_models[[5]] <- lm(d_yal ~ d_asx + d_bdi, data = df_red)
-aic_models[[6]] <- lm(d_yal ~ d_coal + d_bdi, data = df_red)
-aic_models[[7]] <- lm(d_yal ~ d_coal + d_asx + d_bdi, data = df_red)
-
-aic_names = c(1:7)
-
-#AIC
-aic = aictab(cand.set = aic_models, modnames = aic_names, second.ord = FALSE)
-
-#AICc
-aic_c = aictab(cand.set = aic_models, modnames = aic_names, second.ord = TRUE)
-
-aic["aic_c"] = aic_c$AICc
-aic["d_coal d_asx d_bdi"] = 0
-aic["Cp"] = 0
-aic["r2"] = 0
-aic["adjr2"] = 0
-
-for (i in c(1:nrow(aic))){
-  aic$`d_coal d_asx d_bdi`[i] = paste(cp[["which"]][i,1],cp[["which"]][i,2],cp[["which"]][i,3], sep = " ") #this is the model inclusion for the first model.
-  aic$Cp[i] = cp[["Cp"]][i] # this is the Cp value
-  aic$r2[i] = r2[["r2"]][i]
-  aic$adjr2[i] = adjr2[["adjr2"]][i]
-}
-
-ms = aic[,-c(4:8)]
-
-model_selection = data.frame(ms$Modnames, ms$`d_coal d_asx d_bdi`, ms$AIC, ms$aic_c, ms$Cp, ms$r2, ms$adjr2)
-
+RunsTest(df$res_lm2)
